@@ -18,10 +18,7 @@ require(HESK_PATH . 'hesk_settings.inc.php');
 define('TEMPLATE_PATH', HESK_PATH . "theme/{$hesk_settings['site_theme']}/");
 require(HESK_PATH . 'inc/common.inc.php');
 require(HESK_PATH . 'inc/customer_accounts.inc.php');
-if ($hesk_settings['customer_portal']==0){
-header("Location:" . HESK_PATH . "admin/index.php");
-exit;
-}
+
 // Are we in maintenance mode?
 hesk_check_maintenance();
 
