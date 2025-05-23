@@ -222,7 +222,9 @@ if ($section === 'GENERAL') {
         $set['barcode'] = $hesk_settings['barcode'];
         $set['barcode']['print'] = 0;
     }
-
+	//Customor Portal
+	$set['customer_portal'] = empty($_POST['s_showportal']) ? 0 : 1;
+	
     // Customer Accounts
     $set['customer_accounts'] = hesk_checkMinMax( intval( hesk_POST('s_customer_accounts') ) , 0, 3, 0);
     if ($set['customer_accounts']) {
@@ -726,6 +728,7 @@ $hesk_settings[\'barcode\']=array(
 );
 
 // --> Customer Accounts
+$hesk_settings[\'customer_portal\']='. hesk_getProperty($set, 'customer_portal') . ';
 $hesk_settings[\'customer_accounts\']=' . hesk_getProperty($set, 'customer_accounts') . ';
 $hesk_settings[\'customer_accounts_required\']=' . hesk_getProperty($set, 'customer_accounts_required') . ';
 $hesk_settings[\'customer_accounts_customer_self_register\']=' . hesk_getProperty($set, 'customer_accounts_customer_self_register') . ';

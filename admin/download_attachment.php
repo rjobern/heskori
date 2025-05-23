@@ -101,32 +101,43 @@ if ( ! file_exists($realpath))
 	hesk_error($hesklang['attdel']);
 }
 
-// Send the file as an attachment to prevent malicious code from executing
-header("Pragma: "); # To fix a bug in IE when running https
-header("Cache-Control: "); # To fix a bug in IE when running https
-header('Content-Description: File Transfer');
-header('Content-Type: application/octet-stream');
-header('Content-Length: ' . $file['size']);
-header('Content-Disposition: attachment; filename=' . $file['real_name']);
 
-// For larger files use chunks, smaller ones can be read all at once
-$chunksize = 1048576; // = 1024 * 1024 (1 Mb)
-if ($file['size'] > $chunksize)
+if (file_exists($realpath))
+
 {
-	$handle = fopen($realpath, 'rb');
-	$buffer = '';
-	while ( ! feof($handle))
-    {
-        set_time_limit(300);
-		$buffer = fread($handle, $chunksize);
-		echo $buffer;
-		flush();
+
+	$mime = mime_content_type($realpath);
+	// Send the file as an attachment to prevent malicious code from executing
+	header("Pragma: "); # To fix a bug in IE when running https
+	header("Cache-Control: "); # To fix a bug in IE when running https
+	//header('Content-Description: File Transfer');
+	//header('Content-Type: application/octet-stream');
+	//header('Content-Length: ' . $file['size']);
+	//header('Content-Disposition: attachment; filename=' . $file['real_name']);
+	header('Content-Type: ' . $mime);
+	header('Content-Disposition: inline; filename="' . basename($realpath) . '"');
+	header('Content-Length: ' . filesize($realpath));
+
+	// For larger files use chunks, smaller ones can be read all at once
+	$chunksize = 1048576; // = 1024 * 1024 (1 Mb)
+	if ($file['size'] > $chunksize)
+	{
+		$handle = fopen($realpath, 'rb');
+		$buffer = '';
+		while ( ! feof($handle))
+    	{
+        	set_time_limit(300);
+			$buffer = fread($handle, $chunksize);
+			echo $buffer;
+			flush();
+		}
+		fclose($handle);
 	}
-	fclose($handle);
-}
-else
-{
-	readfile($realpath);
-}
+	else
+	{
+		readfile($realpath);
+		exit;
+	}
 
-exit();
+}	
+?>

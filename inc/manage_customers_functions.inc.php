@@ -34,6 +34,15 @@ function hesk_customer_tab($session_array='new', $customer_verified = false)
                 <input type="text" class="form-control <?php echo in_array('email', $errors) ? 'isError' : ''; ?>" name="email" maxlength="255" id="prof_user"
                        value="<?php echo $_SESSION[$session_array]['email']; ?>">
             </div>
+            <div class="form-group">
+                <label for="prof_phone"><?php echo $hesklang['phone']; ?></label>
+                <input type="text" class="form-control <?php echo in_array('phone', $errors) ? 'isError' : ''; ?>" id="prof_phone" name="phone" maxlength="50"
+                value="<?php echo $_SESSION[$session_array]['phone']; ?>">
+            </div>
+            <div class="form-group">
+                <label for="prof_comment"><?php echo $hesklang['comment']; ?></label>
+                <textarea class="form-control"id="prof_comment"name="comment" rows="6" cols="60" style="height: auto; resize: vertical; transition: none;"><?php echo($_SESSION[$session_array]['comment']); ?> </textarea>
+            </div>
             <?php if ($hesk_settings['customer_accounts']): ?>
             <section class="item--section customer-password">
                 <h4>

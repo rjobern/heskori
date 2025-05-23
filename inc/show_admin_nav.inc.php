@@ -318,57 +318,9 @@ $calling_script = basename($_SERVER['PHP_SELF'], '.php');
                     </li>
                     <?php
                 }
-
                 // Modules
-                if (hesk_checkPermission('can_run_reports',0) ||
-                    hesk_checkPermission('can_man_settings',0)) {
-                    $pages = array('module_statistics', 'module_escalate', 'module_satisfaction', 'module_satisfaction_optout');
-                    $open_menu = in_array($calling_script, $pages) ? 'current submenu-is-opened' : '';
-                ?>
-                <li class="listitem submenu <?php echo $open_menu; ?>">
-                    <div class="listitem__icon">
-                        <a href="#">
-                            <svg class="icon icon-modules">
-                                <use xlink:href="<?php echo HESK_PATH; ?>img/sprite.svg#icon-modules"></use>
-                            </svg>
-                        </a>
-                    </div>
-                    <div class="listitem__menu">
-                        <a href="#" class="listitem__caption">
-                            <?php echo $hesklang['modules']; ?>
-                        </a>
-                        <ul class="submenu__list">
-                            <?php if (hesk_checkPermission('can_run_reports',0)) {
-                                ?>
-                                <li class="submenu__listitem <?php if ($calling_script === 'module_statistics') { ?>current<?php } ?>">
-                                    <a href="module_statistics.php">
-                                        <?php echo $hesklang['statistics']['tab']; ?>
-                                    </a>
-                                </li>
-                                <?php
-                            }
-
-                            if (hesk_checkPermission('can_man_settings',0)) {
-                                ?>
-                                <li class="submenu__listitem <?php if ($calling_script === 'module_escalate') { ?>current<?php } ?>">
-                                    <a href="module_escalate.php">
-                                        <?php echo $hesklang['escalate']['tab']; ?>
-                                    </a>
-                                </li>
-                                <li class="submenu__listitem <?php if ($calling_script === 'module_satisfaction' || $calling_script === 'module_satisfaction_optout') { ?>current<?php } ?>">
-                                    <a href="module_satisfaction.php">
-                                        <?php echo $hesklang['satisfaction']['tab']; ?>
-                                    </a>
-                                </li>
-                                <?php
-                            }
-                            ?>
-                        </ul>
-                    </div>
-                </li>
-                <?php
-                }
-
+                
+                
                 // Tools
                 if (hesk_checkPermission('can_ban_emails',0) ||
                     hesk_checkPermission('can_ban_ips',0) ||

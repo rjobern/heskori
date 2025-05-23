@@ -31,6 +31,7 @@ hesk_checkPermission('can_reply_tickets');
 /* A security check */
 hesk_token_check('POST');
 
+
 /* Ticket ID */
 var_dump( $_POST );
 $trackingID = hesk_cleanID() or die($hesklang['int_error'].': '.$hesklang['no_trackID']);

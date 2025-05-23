@@ -51,6 +51,7 @@ $_SERVER['PHP_SELF'] = 'admin_ticket.php?track='.$trackingID.'&Refresh='.rand(10
 
 /* New owner ID */
 $owner = intval( hesk_REQUEST('owner') );
+$status= intval( hesk_REQUEST('s') );
 
 /* If ID is -1 the ticket will be unassigned */
 if ($owner == -1)
@@ -117,7 +118,10 @@ if ($can_assign_others || ($owner == $_SESSION['id'] && $can_assign_self))
 
 	$revision = sprintf($hesklang['thist2'],hesk_date(),addslashes($row['name']).' ('.$row['user'].')',addslashes($_SESSION['name']).' ('.$_SESSION['user'].')');
 	$res = hesk_dbQuery("UPDATE `".hesk_dbEscape($hesk_settings['db_pfix'])."tickets` SET `owner`={$owner} {$assignedby}, `history`=CONCAT(`history`,'".hesk_dbEscape($revision)."') WHERE `trackid`='".hesk_dbEscape($trackingID)."'");
-
+	if ($status==0){
+		$status=4;
+		hesk_dbQuery("UPDATE `".hesk_dbEscape($hesk_settings['db_pfix'])."tickets` SET `status`='{$status}' WHERE `trackid`='".hesk_dbEscape($trackingID)."'");
+	}
     if ($owner != $_SESSION['id'] && !hesk_checkPermission('can_view_ass_others',0))
     {
     	$_SERVER['PHP_SELF']='admin_main.php';

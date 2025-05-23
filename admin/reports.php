@@ -270,15 +270,15 @@ hesk_handle_messages();
                         <label for="w0">&nbsp;</label>
                         <div class="dropdown-select center out-close">
                             <select name="time" onclick="document.getElementById('w0').checked = true" onchange="document.getElementById('w0').checked = true" style="margin-top:5px;margin-bottom:5px;">
-                                <option value="1" <?php echo $selected['time'][1]; ?>><?php echo $hesklang['r1']; ?> (<?php echo $hesklang['d'.date('w')]; ?>)</option>
-                                <option value="2" <?php echo $selected['time'][2]; ?>><?php echo $hesklang['r2']; ?> (<?php echo $hesklang['d'.date('w',mktime(0, 0, 0, date('m'), date('d')-1, date('Y')))]; ?>)</option>
+                                <!option value="1" <!?php echo $selected['time'][1]; ?>><!?php echo $hesklang['r1']; ?> (<!?php echo $hesklang['d'.date('w')]; ?>)</option>
+                                <!option value="2" <!?php echo $selected['time'][2]; ?>><!?php echo $hesklang['r2']; ?> (<!?php echo $hesklang['d'.date('w',mktime(0, 0, 0, date('m'), date('d')-1, date('Y')))]; ?>)</option>
                                 <option value="3" <?php echo $selected['time'][3]; ?>><?php echo $hesklang['r3']; ?> (<?php echo $hesklang['m'.date('n')]; ?>)</option>
                                 <option value="4" <?php echo $selected['time'][4]; ?>><?php echo $hesklang['r4']; ?> (<?php echo $hesklang['m'.date('n',mktime(0, 0, 0, date('m')-1, 1, date('Y')))]; ?>)</option>
                                 <option value="5" <?php echo $selected['time'][5]; ?>><?php echo $hesklang['r5']; ?></option>
-                                <option value="6" <?php echo $selected['time'][6]; ?>><?php echo $hesklang['r6']; ?></option>
-                                <option value="7" <?php echo $selected['time'][7]; ?>><?php echo $hesklang['r7']; ?></option>
-                                <option value="8" <?php echo $selected['time'][8]; ?>><?php echo $hesklang['r8']; ?></option>
-                                <option value="9" <?php echo $selected['time'][9]; ?>><?php echo $hesklang['r9']; ?></option>
+                                <!option value="6" <!?php echo $selected['time'][6]; ?>><!?php echo $hesklang['r6']; ?></option>
+                                <!option value="7" <!?php echo $selected['time'][7]; ?>><!?php echo $hesklang['r7']; ?></option>
+                                <!option value="8" <!?php echo $selected['time'][8]; ?>><!?php echo $hesklang['r8']; ?></option>
+                                <!option value="9" <!?php echo $selected['time'][9]; ?>><!?php echo $hesklang['r9']; ?></option>
                                 <option value="10" <?php echo $selected['time'][10]; ?>><?php echo $hesklang['r10']; ?> (<?php echo date('Y'); ?>)</option>
                                 <option value="11" <?php echo $selected['time'][11]; ?>><?php echo $hesklang['r11']; ?> (<?php echo date('Y',mktime(0, 0, 0, date('m'), date('d'), date('Y')-1)); ?>)</option>
                                 <option value="12" <?php echo $selected['time'][12]; ?>><?php echo $hesklang['r12']; ?></option>
@@ -340,11 +340,15 @@ hesk_handle_messages();
             <h4><?php echo $hesklang['crt']; ?></h4>
             <div class="dropdown-select center out-close">
                 <select name="type">
-                    <option value="1" <?php echo $selected['type'][1]; ?>><?php echo $hesklang['t1']; ?></option>
-                    <option value="2" <?php echo $selected['type'][2]; ?>><?php echo $hesklang['t2']; ?></option>
-                    <option value="3" <?php echo $selected['type'][3]; ?>><?php echo $hesklang['t3']; ?></option>
+					<option value="1" <?php echo $selected['type'][1]; ?>><?php echo $hesklang['t1']; ?></option>
+					<option value="2" <?php echo $selected['type'][2]; ?>><?php echo $hesklang['t2']; ?></option>
+					<option value="3" <?php echo $selected['type'][3]; ?>><?php echo $hesklang['t3']; ?></option>
                     <option value="4" <?php echo $selected['type'][4]; ?>><?php echo $hesklang['t4']; ?></option>
-                </select>
+                    <option value="5" <?php echo $selected['type'][5]; ?>><?php echo $hesklang['t5']; ?></option>
+                    <option value="6" <?php echo $selected['type'][6]; ?>><?php echo $hesklang['t6']; ?></option>
+                    <option value="7" <?php echo $selected['type'][7]; ?>><?php echo $hesklang['t7']; ?></option>
+				</select>
+				
             </div>
         </div>
         <div class="reports__type">
@@ -376,17 +380,32 @@ if ( ! $can_run_reports_full)
 /* Report type */
 switch ($type)
 {
+	case 1:
+    	hesk_ticketsByCustomfied('Typ');
+		//hesk_ticketsByTyp();	
+		break;
 	case 2:
-    	hesk_ticketsByMonth();
-        break;
+		hesk_ticketsByCustomfied('Ergebnis');
+		//hesk_ticketsByTyp();	
+		break;	
 	case 3:
+		hesk_ticketsByCustomfied('Gerät');	
+		break;
+	case 4:
+		ticketsbytwocategories('Ergebnis','Typ');
+		break;
+	case 5:
+		ticketsbytwocategories('Ergebnis','Gerät');
+		break;
+    case 6:
+		hesk_ticketsByMonth();
+        break;	
+	case 7:
     	hesk_ticketsByUser();
         break;
-	case 4:
-    	hesk_ticketsByCategory();
-        break;
 	default:
-    	hesk_ticketsByDay();
+    hesk_ticketsByCustomfied('Typ');	
+	//hesk_ticketsByTyp();
 }
 
 require_once(HESK_PATH . 'inc/footer.inc.php');
@@ -395,181 +414,6 @@ exit();
 
 /*** START FUNCTIONS ***/
 
-
-function hesk_ticketsByCategory()
-{
-	global $hesk_settings, $hesklang, $date_from, $date_to, $can_run_reports_full;
-
-	/* List of categories */
-	$cat = array();
-	$res = hesk_dbQuery("SELECT `id`,`name` FROM `".hesk_dbEscape($hesk_settings['db_pfix'])."categories` WHERE " . ( $can_run_reports_full ? '1' : hesk_myCategories('id') ) . " ORDER BY `id` ASC");
-	while ($row=hesk_dbFetchAssoc($res))
-	{
-		$cat[$row['id']]=$row['name'];
-	}
-
-	$tickets = array();
-    $totals = array('num_tickets' => 0, 'resolved' => 0, 'all_replies' => 0, 'staff_replies' => 0, 'worked' => 0);
-
-    /* Populate category counts */
-    foreach ($cat as $id => $name)
-    {
-    	$tickets[$id] = array(
-        'num_tickets' => 0,
-        'resolved' => 0,
-        'all_replies' => 0,
-        'staff_replies' => 0,
-		'worked' => '',
-        );
-    }
-
-	/* SQL query for category stats */
-	$res = hesk_dbQuery("SELECT `category`, COUNT(*) AS `num_tickets`, ".($hesk_settings['time_worked'] ? "SUM( TIME_TO_SEC(`time_worked`) ) AS `seconds_worked`," : '')." SUM(`replies`) AS `all_replies`, SUM(staffreplies) AS `staff_replies` FROM `".hesk_dbEscape($hesk_settings['db_pfix'])."tickets` WHERE {$hesk_settings['dt_sql']} " . ( $can_run_reports_full ? "" : " AND `t1`.`owner` = '" . intval($_SESSION['id']) . "'" ) . " GROUP BY `category`");
-
-	/* Update ticket values */
-	while ($row = hesk_dbFetchAssoc($res))
-	{
-		if ( ! $hesk_settings['time_worked'])
-		{
-        	$row['seconds_worked'] = 0;
-		}
-
-    	if (isset($cat[$row['category']]))
-        {
-        	$tickets[$row['category']]['num_tickets'] += $row['num_tickets'];
-            $tickets[$row['category']]['all_replies'] += $row['all_replies'];
-            $tickets[$row['category']]['staff_replies'] += $row['staff_replies'];
-            $tickets[$row['category']]['worked'] = $hesk_settings['time_worked'] ? hesk_SecondsToHHMMSS($row['seconds_worked']) : 0;
-        }
-        else
-        {
-        	/* Category deleted */
-			if ( ! isset($tickets[9999]) )
-			{
-				$cat[9999] = $hesklang['catd'];
-				$tickets[9999] = array('num_tickets' => $row['num_tickets'], 'resolved' => 0, 'all_replies' => $row['all_replies'], 'staff_replies' => $row['staff_replies'], 'worked' => $row['seconds_worked']);
-			}
-			else
-			{
-				$tickets[9999]['num_tickets'] += $row['num_tickets'];
-				$tickets[9999]['all_replies'] += $row['all_replies'];
-				$tickets[9999]['staff_replies'] += $row['staff_replies'];
-				$tickets[9999]['worked'] += $row['seconds_worked'];
-			}
-        }
-
-		$totals['num_tickets'] += $row['num_tickets'];
-		$totals['all_replies'] += $row['all_replies'];
-		$totals['staff_replies'] += $row['staff_replies'];
-		$totals['worked'] += $row['seconds_worked'];
-	}
-
-	// Get number of resolved tickets
-	$res = hesk_dbQuery("SELECT COUNT(*) AS `num_tickets` , `category` FROM `".hesk_dbEscape($hesk_settings['db_pfix'])."tickets` WHERE `status` = '3' " . ( $can_run_reports_full ? "" : " AND `owner` = '" . intval($_SESSION['id']) . "'" ) . " AND {$hesk_settings['dt_sql']} GROUP BY `category`");
-
-	// Update number of open and resolved tickets
-	while ($row = hesk_dbFetchAssoc($res))
-	{
-    	if (isset($cat[$row['category']]))
-        {
-        	$tickets[$row['category']]['resolved'] += $row['num_tickets'];
-        }
-        else
-        {
-        	// Category deleted
-        	$tickets[9999]['resolved'] += $row['num_tickets'];
-        }
-
-		$totals['resolved'] += $row['num_tickets'];
-	}
-
-	// Convert total seconds worked to HH:MM:SS
-	$totals['worked'] = $hesk_settings['time_worked'] ? hesk_SecondsToHHMMSS($totals['worked']) : 0;
-	if ( isset($tickets[9999]) )
-	{
-		$tickets[9999]['worked'] = $hesk_settings['time_worked'] ? hesk_SecondsToHHMMSS($tickets[9999]['worked']) : 0;
-	}
-
-	?>
-    <div class="reports__table">
-	    <table id="default-table" class="table sindu-table sindu_origin_table">
-            <thead>
-            <tr>
-                <th><?php echo $hesklang['category']; ?></th>
-                <th><?php echo $hesklang['tickets']; ?></th>
-                <th><?php echo $hesklang['topen']; ?></th>
-                <th><?php echo $hesklang['closed']; ?></th>
-                <th><?php echo $hesklang['replies'] . ' (' . $hesklang['all'] .')'; ?></th>
-                <th><?php echo $hesklang['replies'] . ' (' . $hesklang['staff'] .')'; ?></th>
-                <?php
-                if ($hesk_settings['time_worked'])
-                {
-                    echo '<th>'.$hesklang['ts'].'</th>';
-                }
-                ?>
-            </tr>
-            </thead>
-
-	<?php
-	$num_tickets = count($tickets);
-	if ($num_tickets > 10)
-	{
-	?>
-          <tr class="total">
-	        <td><b><?php echo $hesklang['totals']; ?></b></td>
-	        <td><b><?php echo $totals['num_tickets']; ?></b></td>
-	        <td><b><?php echo $totals['num_tickets'] - $totals['resolved']; ?></b></td>
-	        <td><b><?php echo $totals['resolved']; ?></b></td>
-	        <td><b><?php echo $totals['all_replies']; ?></b></td>
-	        <td><b><?php echo $totals['staff_replies']; ?></b></td>
-			<?php
-			if ($hesk_settings['time_worked'])
-			{
-				echo '<td><b>'.$totals['worked'].'</b></td>';
-			}
-			?>
-	      </tr>
-	<?php
-	}
-
-	foreach ($tickets as $k => $d)
-	{
-	    ?>
-	      <tr>
-	        <td><?php echo $cat[$k]; ?></td>
-	        <td><?php echo $d['num_tickets']; ?></td>
-	        <td><?php echo $d['num_tickets']-$d['resolved']; ?></td>
-	        <td><?php echo $d['resolved']; ?></td>
-	        <td><?php echo $d['all_replies']; ?></td>
-	        <td><?php echo $d['staff_replies']; ?></td>
-			<?php
-			if ($hesk_settings['time_worked'])
-			{
-				echo '<td>'.$d['worked'].'</td>';
-			}
-			?>
-	      </tr>
-	    <?php
-	}
-	?>
-	      <tr class="total">
-	        <td><b><?php echo $hesklang['totals']; ?></b></td>
-	        <td><b><?php echo $totals['num_tickets']; ?></b></td>
-	        <td><b><?php echo $totals['num_tickets'] - $totals['resolved']; ?></b></td>
-	        <td><b><?php echo $totals['resolved']; ?></b></td>
-	        <td><b><?php echo $totals['all_replies']; ?></b></td>
-	        <td><b><?php echo $totals['staff_replies']; ?></b></td>
-			<?php
-			if ($hesk_settings['time_worked'])
-			{
-				echo '<td><b>'.$totals['worked'].'</b></td>';
-			}
-			?>
-	      </tr>
-	    </table>
-    </div>
-    <?php
-} // END hesk_ticketsByCategory
 
 
 function hesk_ticketsByUser()
@@ -776,6 +620,155 @@ function hesk_ticketsByUser()
     <?php
 } // END hesk_ticketsByUser
 
+function hesk_ticketsByCustomfied($customfield)
+{
+	global $hesk_settings, $hesklang, $date_from, $date_to;
+
+	// Some variables we will need
+	$tickets = array();
+    $totals = array('asstickets' => 0, 'resolved' => 0, 'tickets' => 0, 'replies' => 0, 'worked' => 0, 'openedby' => 0);
+
+	// Get list of users
+	$types = array();
+
+	// I. ADMINISTRATORS can view all users
+	if ($_SESSION['isadmin'] || hesk_checkPermission('can_run_reports_full', 0) )
+	{
+    	// -> get list of types
+
+		$res = hesk_dbQuery("SELECT `id`,`name`,`value` FROM `".hesk_dbEscape($hesk_settings['db_pfix'])."custom_fields` where `use`!='0'");
+		while ($row = mysqli_fetch_assoc($res))
+		{
+			$id   = $row['id'];
+			$name = json_decode($row['name'], true)['Deutsch'] ?? '';
+			$value = json_decode($row['value'],true);
+			$Options=$value['select_options'];
+			if ($name==$customfield) {break;}
+
+		}
+		//number of customfield	
+		$nr=$id;
+		$processedOptions = [];
+		$processedOptions = ['' => ''];
+		foreach ($Options as $option) {
+    	$processedOptions[] = $option;
+		}
+		      // -> populate $types and $tickets arrays
+			  foreach($processedOptions as $id => $option) {
+					$types[] = $option;
+					$tickets[$option] = array(
+						'asstickets' => 0,
+						'resolved' => 0,
+						'tickets' => 0,
+						'replies' => 0,
+						'worked' => '',
+						'openedby' => 0,
+					);
+			  	}
+		        
+		//TYp ist in customfield 1
+        // -> get list of tickets
+			$res = hesk_dbQuery("SELECT `custom{$nr}`, COUNT(*) AS `cnt`  
+					FROM `".hesk_dbEscape($hesk_settings['db_pfix'])."tickets` 
+					WHERE `custom{$nr}` IN ('" . implode("','", array_values($types) ) . "') AND {$hesk_settings['dt_sql']} GROUP BY `custom{$nr}`");
+
+		// -> update ticket list values
+		while ($row = hesk_dbFetchAssoc($res))
+		{
+			if ( ! $hesk_settings['time_worked'])
+			{
+				$row['seconds_worked'] = 0;
+			}
+
+			$tickets[$row['custom'.$nr]]['asstickets'] += $row['cnt'];
+			$totals['asstickets'] += $row['cnt'];
+			$tickets[$row['custom'.$nr]]['worked'] = $hesk_settings['time_worked'] ? hesk_SecondsToHHMMSS($row['seconds_worked']) : 0;
+			$totals['worked'] += $row['seconds_worked'];
+		}
+
+        // -> get list of resolved tickets
+		$res = hesk_dbQuery("SELECT `custom{$nr}`, COUNT(*) AS `cnt` FROM `".hesk_dbEscape($hesk_settings['db_pfix'])."tickets` WHERE `custom{$id}` IN ('" . implode("','", array_values($types) ) . "') AND `status`='3' AND {$hesk_settings['dt_sql']} GROUP BY `custom{$nr}`");
+
+		// -> update resolved ticket list values
+		while ($row = hesk_dbFetchAssoc($res))
+		{
+			$tickets[$row['custom'.$nr]]['resolved'] += $row['cnt'];
+			$totals['resolved'] += $row['cnt'];
+		}
+
+	}
+	?>
+    <div class="reports__table">
+	    <table id="default-table" class="table sindu-table sindu_origin_table">
+            <thead>
+            <tr>
+                <th><?php echo $hesklang['Type']; ?></th>
+                <th><?php echo $hesklang['ticass']; ?></th>
+                <th><?php echo $hesklang['topen']; ?></th>
+                <th><?php echo $hesklang['closed']; ?></th>
+                <?php
+                if ($hesk_settings['time_worked'])
+                {
+                    echo '<th>'.$hesklang['ts'].'</th>';
+                }
+                ?>
+            </tr>
+            </thead>
+
+	<?php
+	$num_tickets = count($tickets);
+	if ($num_tickets > 10)
+	{
+	?>
+          <tr class="total">
+	        <td><b><?php echo $hesklang['totals']; ?></b></td>
+	        <td><b><?php echo $totals['asstickets']; ?></b></td>
+	        <td><b><?php echo $totals['asstickets']-$totals['resolved']; ?></b></td>
+	        <td><b><?php echo $totals['resolved']; ?></b></td>
+			<?php
+			if ($hesk_settings['time_worked'])
+			{
+				echo '<td><b>'.$totals['worked'].'</b></td>';
+			}
+			?>
+	      </tr>
+	<?php
+	}
+
+	foreach ($tickets as $k => $d)
+	{
+	    ?>
+	      <tr>
+	        <td><?php echo $k !== '' ? $k : $hesklang['nass']; ?></td>
+	        <td><?php echo $d['asstickets']; ?></td>
+	        <td><?php echo $d['asstickets']-$d['resolved']; ?></td>
+	        <td><?php echo $d['resolved']; ?></td>
+			<?php
+			if ($hesk_settings['time_worked'])
+			{
+				echo '<td>'.$d['worked'].'</td>';
+			}
+			?>
+	      </tr>
+	    <?php
+	}
+	?>
+	      <tr class="total">
+	        <td><b><?php echo $hesklang['totals']; ?></b></td>
+	        <td><b><?php echo $totals['asstickets']; ?></b></td>
+	        <td><b><?php echo $totals['asstickets']-$totals['resolved']; ?></b></td>
+	        <td><b><?php echo $totals['resolved']; ?></b></td>
+			<?php
+			if ($hesk_settings['time_worked'])
+			{
+				echo '<td><b>'.$totals['worked'].'</b></td>';
+			}
+			?>
+	      </tr>
+	    </table>
+    </div>
+    <?php
+} // END hesk_ticketsByCustomfield
 
 function hesk_ticketsByMonth()
 {
@@ -1021,5 +1014,152 @@ function hesk_ticketsByDay()
     </div>
     <?php
 } // END hesk_ticketsByDay
+function ticketsbytwocategories($custom1,$custom2)
+{
+		global $hesk_settings, $hesklang, $date_from, $date_to;
+
+		// Some variables we will need
+		$tickets = array();
+    	$totals = array('asstickets' => 0, 'resolved' => 0, 'tickets' => 0, 'replies' => 0, 'worked' => 0, 'openedby' => 0);
+	
+		$res = hesk_dbQuery("SELECT `id`,`name`,`value` FROM `".hesk_dbEscape($hesk_settings['db_pfix'])."custom_fields` where `use`!='0'");
+		while ($row = mysqli_fetch_assoc($res))
+		{
+			$id   = $row['id'];
+			$name1 = json_decode($row['name'], true)['Deutsch'] ?? '';
+			$value = json_decode($row['value'],true);
+			$Options=$value['select_options'];
+			if ($name1==$custom1) {break;}
+
+		}
+		//number of customfield	
+		$nr1=$id;
+		$processedOptions = [];
+		$processedOptions = ['' => ''];
+		foreach ($Options as $option) {
+    	$processedOptions[] = $option;
+		}
+		      // -> populate $types and $tickets arrays
+			  foreach($processedOptions as $id => $option) {
+					$types1[] = $option;
+		}
+		$processedOptions = [];		
+		$res = hesk_dbQuery("SELECT `id`,`name`,`value` FROM `".hesk_dbEscape($hesk_settings['db_pfix'])."custom_fields` where `use`!='0'");
+		while ($row = mysqli_fetch_assoc($res))
+		{
+			$id   = $row['id'];
+			$name2 = json_decode($row['name'], true)['Deutsch'] ?? '';
+			$value = json_decode($row['value'],true);
+			$Options=$value['select_options'];
+			if ($name2==$custom2) {break;}
+
+		}
+		//number of customfield	
+		$nr2=$id;
+		$processedOptions = [];
+		$processedOptions = ['' => ''];
+		foreach ($Options as $option) 
+		{
+    	$processedOptions[] = $option;
+		}
+		      // -> populate $types and $tickets arrays
+		foreach($processedOptions as $id => $option)
+		{
+					$types2[] = $option;
+		}
+		        
+		//TYp ist in customfield 1
+        // -> get list of tickets
+		$res = hesk_dbQuery("SELECT `custom{$nr1}`,`custom{$nr2}`, COUNT(*) AS `cnt`  
+		FROM `".hesk_dbEscape($hesk_settings['db_pfix'])."tickets` 
+		WHERE `custom{$nr1}` IN ('" . implode("','", array_values($types1) ) . "') AND `custom{$nr2}` IN ('" . implode("','", array_values($types2) ) . "') AND {$hesk_settings['dt_sql']} GROUP BY `custom{$nr1}`, `custom{$nr2}`");
+		?>
+		<div class="reports__table">
+	    <table id="default-table" class="table sindu-table sindu_origin_table">
+        <thead>
+        <tr>
+                <th> <?php echo $name1; ?></th>
+				<th> <?php echo $name2; ?></th>
+                <th> <?php echo $hesklang['counts']; ?></th>
+                
+            </tr>
+            </thead>
+			<tbody>
+			<?php
+			$data = [];
+			$labels = [];
+while ($row = hesk_dbFetchAssoc($res)) {
+	// Kombiniere Spalte 1 und 2 als Beschriftung (optional)
+    $label = $row['custom' . $nr1] . ' - ' . $row['custom' . $nr2];
+    $labels[] = $label;
+    $data[] = (int)$row['cnt'];
+ 
+    echo '<tr>';
+    echo '<td>' . ($row['custom' . $nr1] !== '' ? $row['custom' . $nr1] : $hesklang['nass']) . '</td>';
+    echo '<td>' . ($row['custom' . $nr2] !== '' ? $row['custom' . $nr2] : $hesklang['nass']) . '</td>';
+    echo '<td>' . (int)$row['cnt'] . '</td>';
+    echo '</tr>';
+}
+$total = array_sum($data);
+echo '</tbody>';
+echo '</table>';
+echo '</div>';
 ?>
-</div>
+	</table>
+	</div>		
+
+<canvas id="pieChart" width="600" height="300"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script>
+    // PHP-Werte an JavaScript übergeben
+    const labels = <?php echo json_encode($labels); ?>;
+    const data = <?php echo json_encode($data); ?>;
+
+    const ctx = document.getElementById('pieChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#FF9F40', '#66FF66', '#FF6666',
+                    '#6699FF', '#FFB366'
+                ]
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        weight: 'bold',
+                        size: 11
+                    },
+                    formatter: function(value, context) {
+                        const dataset = context.chart.data.datasets[0].data;
+                        const total = dataset.reduce((a, b) => a + b, 0);
+                        const percent = ((value / total) * 100).toFixed(1);
+                        return percent + '%';
+                    }
+                },
+                legend: {
+                    position: 'right'
+                },
+                title: {
+                    display: true,
+                    text: <?php echo json_encode($hesklang['graftitle']); ?>
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+</script>
+			<?php	
+			
+}		

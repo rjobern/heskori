@@ -949,7 +949,7 @@ if ($hesk_settings['attachments']['use'] && ! defined('HESK_DEMO') ) {
                                     <use xlink:href="<?php echo HESK_PATH; ?>img/sprite.svg#icon-info"></use>
                                 </svg>
                             </div>
-                        </a>
+                        </a> 
                     </h5>
                     <?php
                     $div = $hesk_settings['barcode']['print'] ? 'block' : 'none';
@@ -1072,8 +1072,28 @@ if ($hesk_settings['attachments']['use'] && ! defined('HESK_DEMO') ) {
                     </div>
                 </div>
             </section>
-            <section class="settings__form_block">
-                <h3><?php echo $hesklang['customer_accounts_heading']; ?></h3>
+            <section class="settings__form_block">   
+                <h3><?php echo $hesklang['customer_site']; ?> </h3>
+                <div class="checkbox-group">
+                    <h5>
+                     <span><?php echo $hesklang['customer_show_portal'];?> </span>
+                     <br>
+                    <label class="switch-checkbox">
+                        <input type="checkbox" name="s_showportal" value="1" <?php if ($hesk_settings['customer_portal']) { echo 'checked'; } ?> onclick="hesk_toggleLayerDisplay('customer_portal')">
+                        
+                        <div class="switch-checkbox__bullet">
+                            <i>
+                                <svg class="icon icon-close">
+                                    <use xlink:href="<?php echo HESK_PATH; ?>img/sprite.svg#icon-close"></use>
+                                </svg>
+                                <svg class="icon icon-tick">
+                                    <use xlink:href="<?php echo HESK_PATH; ?>img/sprite.svg#icon-tick"></use>
+                                </svg>
+                            </i>
+                        </div>
+                    </label>
+                                </h5>
+                </div>        
                 <div class="radio-group">
                     <h5>
                         <span><?php echo $hesklang['customer_accounts']; ?></span>

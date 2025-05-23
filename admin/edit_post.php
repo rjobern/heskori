@@ -515,6 +515,7 @@ require_once(HESK_PATH . 'inc/show_admin_nav.inc.php');
                 </script>
                 <?php
                 foreach ($hesk_settings['custom_fields'] as $k=>$v) {
+                    // ausgeschaltet
                     if ($v['use'] && $v['place']==0 && (strlen($ticket[$k]) || hesk_is_custom_field_in_category($k, $ticket['category'])) ) {
                         $k_value  = $ticket[$k];
 
@@ -565,7 +566,7 @@ require_once(HESK_PATH . 'inc/show_admin_nav.inc.php');
 
                             /* Select drop-down box */
                             case 'select':
-
+                                break;
                                 $cls = in_array($k,$_SESSION['iserror']) ? ' class="isError" ' : '';
 
                                 echo '
@@ -726,6 +727,7 @@ require_once(HESK_PATH . 'inc/show_admin_nav.inc.php');
             if (!$is_reply)
             {
                 foreach ($hesk_settings['custom_fields'] as $k=>$v) {
+                    //ausgeschalt   et
                     if ($v['use'] && $v['place'] && hesk_is_custom_field_in_category($k, $ticket['category']) ) {
                         $k_value  = $ticket[$k];
 
@@ -776,7 +778,7 @@ require_once(HESK_PATH . 'inc/show_admin_nav.inc.php');
 
                             /* Select drop-down box */
                             case 'select':
-
+                                
                                 $cls = in_array($k,$_SESSION['iserror']) ? ' class="isError" ' : '';
 
                                 echo '

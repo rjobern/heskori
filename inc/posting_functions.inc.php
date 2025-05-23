@@ -24,6 +24,8 @@ function hesk_newTicket($ticket)
     $primary_customer = hesk_get_customer_account_by_id($ticket['customer_id']);
     $name = $primary_customer['name'];
     $email = $primary_customer['email'];
+	$phone=$primary_customer['phone'];
+	$comment=$primary_customer['comment'];
     if ($primary_customer['verified'] !== 1) {
         if (isset($ticket['name'])) {
             $name = $ticket['name'];

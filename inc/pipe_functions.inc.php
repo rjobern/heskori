@@ -139,7 +139,7 @@ function hesk_email2ticket($results, $protocol = 0, $set_category = 1, $set_prio
 
     //-- Retrieve (or create) customer
     if ($hesk_settings['customer_accounts'] === 0 || ($hesk_settings['customer_accounts'] === 1 && $hesk_settings['customer_accounts_required'] === 0)) {
-        $tmpvar['customer_id'] = hesk_get_or_create_customer($tmpvar['name'], $tmpvar['email']);
+        $tmpvar['customer_id'] = hesk_get_or_create_customer($tmpvar['name'], $tmpvar['email'], $tmpvar['phone'], $tmpvar['comment']);
     } else {
         // Only allow existing customers to email their tickets/replies
         $tmpvar['customer_id'] = hesk_get_customer_id_by_email($tmpvar['email'], true);

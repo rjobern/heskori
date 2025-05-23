@@ -48,6 +48,8 @@ $hesk_settings['datepicker'] = array();
 // First, reset data if any query string value is present
 if (isset($_REQUEST['name']) ||
     isset($_REQUEST['email']) ||
+    isset($_REQUEST['phone']) ||
+    isset($_REQUEST['comment']) ||
     isset($_REQUEST['priority']) ||
     isset($_REQUEST['status']) ||
     isset($_REQUEST['subject']) ||
@@ -67,6 +69,8 @@ foreach ($hesk_settings['custom_fields'] as $k=>$v) {
 // Customer name
 $predefined_name = '';
 $predefined_email = '';
+$predefined_comment='';
+$predefined_phone='';
 if (isset($_REQUEST['name'])) {
 	$predefined_name = $_REQUEST['name'];
 }
@@ -74,6 +78,12 @@ if (isset($_REQUEST['name'])) {
 // Customer email address
 if (isset($_REQUEST['email'])) {
 	$predefined_email = $_REQUEST['email'];
+}
+if (isset($_REQUEST['phone'])) {
+	$predefined_phone = $_REQUEST['phone'];
+}
+if (isset($_REQUEST['comment'])) {
+	$predefined_comment = $_REQUEST['comment'];
 }
 
 // Category ID
@@ -337,6 +347,9 @@ if ($predefined_name !== '') {
                         */
                         let nameValue = '';
                         let emailValue = '';
+                        let phoneValue= '';
+                        let commentValue= '';
+                        
                         if (extraData) {
                             if (typeof extraData.nameValue !== 'undefined' && typeof extraData.nameValue === 'string') {
                                 nameValue = extraData.nameValue;
@@ -347,7 +360,8 @@ if ($predefined_name !== '') {
                         }
                         $('[data-modal-id="create-customer"] input[name="name"]').val(nameValue);
                         $('[data-modal-id="create-customer"] input[name="email"]').val(emailValue);
-
+                        $('[data-modal-id="create-customer"] input[name="phone"]').val(phoneValue);
+                        $('[data-modal-id="create-customer"] input[name="comment"]').val(commentValue);    
                         // 2.) Update any titles and other related meta data
                         let createCustomerTitle = '<?php echo hesk_makeJsString($hesklang['new_customer']); ?>';
                         let customerType = 'CUSTOMER';
@@ -382,9 +396,13 @@ if ($predefined_name !== '') {
                     $(document).ready(function() {
                         $('[data-modal-id="create-customer"] input[name="name"]').val('<?php echo hesk_makeJsString($predefined_name); ?>');
                         $('[data-modal-id="create-customer"] input[name="email"]').val('<?php echo hesk_makeJsString($predefined_email); ?>');
+                        $('[data-modal-id="create-customer"] input[name="phone"]').val('<?php echo hesk_makeJsString($predefined_phone); ?>');
+                        $('[data-modal-id="create-customer"] input[name="comment"]').val('<?php echo hesk_makeJsString($predefined_comment); ?>');
                         $('[data-modal-id="create-customer"]').css('display', 'block');
                         $('#create_name').keyup();
                         $('#email').keyup();
+                        $('#phone').keyup();
+                        $('#comment').keyup();
                     });
                     <?php endif; ?>
 
@@ -1181,7 +1199,7 @@ if ($predefined_name !== '') {
                 <label><?php echo $hesklang['addop']; ?>:</label>
                 <div class="checkbox-list">
                     <div class="checkbox-custom">
-                        <input type="checkbox" id="create_notify1" name="notify" value="1" <?php echo empty($_SESSION['as_notify']) ? '' : 'checked'; ?>>
+                        <input type="checkbox" id="create_notify1" name="notify" value="1" <?php echo empty($_SESSION['as_notify']) ? '' : 'unchecked'; ?>>
                         <label for="create_notify1"><?php echo $hesklang['seno']; ?></label>
                     </div>
                     <?php if (hesk_checkPermission('can_view_tickets',0)): ?>
@@ -1349,6 +1367,23 @@ if ($predefined_name !== '') {
                     <div class="form-control__error"></div>
                 </div>
                 <div id="email_suggestions"></div>
+            
+                <div class="form-group">
+                    <label for="create_phone">
+                        <?php echo $hesklang['phone']; ?>: </span>
+                    </label>
+                    <input type="text" id="create_phone" name="phone" class="form-control" maxlength="50">
+                    <div class="form-control__error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="create_comment">
+                        <?php echo $hesklang['comment']; ?>: </span>
+                    </label>
+                    <textarea class="form-control" id="create_comment" name="comment" rows="6" cols="60" style="height: auto; resize: vertical; transition: none;"></textarea>
+                    <!input type="text" id="create_comment" name="comment" class="form-control" maxlength="255">
+                    <div class="form-control__error"></div>
+                </div>
+                
             </div>
         </div>
         <div class="modal__buttons">
@@ -1359,6 +1394,8 @@ if ($predefined_name !== '') {
         <script>
             var $name = $('#create_name');
             var $email = $('#email');
+            var $phone = $('#create_phone');
+            var $comment=$('#create_comment');
             var $saveButton = $("[data-modal-id='create-customer']").find('a[data-confirm-button]');
             var nameValid = false;
             var emailValid = false;
@@ -1459,7 +1496,9 @@ if ($predefined_name !== '') {
                     type: 'POST',
                     data: {
                         name: $name.val(),
-                        email: $email.val()
+                        email: $email.val(),
+                        phone: $phone.val(),
+                        comment:$comment.val()
                     },
                     dataType: 'json',
                     success: function(data) {
@@ -1484,6 +1523,8 @@ if ($predefined_name !== '') {
                         }
                         $name.val('');
                         $email.val('');
+                        $phone.val('');
+                        $comment.val('');
                         $('[data-modal-id="create-customer"]').find('[data-action="cancel"]').click();
                     },
                     error: function(err) {

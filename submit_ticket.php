@@ -44,7 +44,7 @@ if ( empty($_POST) && ! empty($_SERVER['CONTENT_LENGTH']) )
 }
 
 // Try to detect some simple SPAM bots
-if ( ! isset($_POST['hx']) || $_POST['hx'] != 3 || ! isset($_POST['hy']) || $_POST['hy'] != '' || isset($_POST['phone']) )
+if ( ! isset($_POST['hx']) || $_POST['hx'] != 3 || ! isset($_POST['hy']) || $_POST['hy'] != '' || ! isset($_POST['phone']) )
 {
 	header('HTTP/1.1 403 Forbidden');
 	exit();
@@ -154,6 +154,8 @@ $email_available = true;
 if ($customer) {
     $tmpvar['name'] = hesk_addslashes($customer['name']);
     $tmpvar['email'] = hesk_addslashes($customer['email']);
+    $tmpvar['phone']= hesk_addslashes($customer['phone']);    
+    $tmpvar['comment']= hesk_addslashes($customer['comment']);
     $tmpvar['customer_id'] = intval($customer['id']);
 } else {
     $tmpvar['name']	 = hesk_input( hesk_POST('name') ) or $hesk_error_buffer['name']=$hesklang['enter_your_name'];
@@ -225,6 +227,9 @@ if ($customer) {
             $_SESSION['c_email2'] =  hesk_POST('email2');
         }
     }
+    $tmpvar['phone']=hesk_input(hesk_POST('phone'));
+    $tmpvar['comment']=hesk_input(hesk_POST('comment'));
+    
 }
 
 $tmpvar['followers'] = $hesk_settings['multi_eml'] ? hesk_validateFollowers(hesk_POST('follower_email')) : [];
@@ -518,6 +523,8 @@ if (count($hesk_error_buffer))
 
     $_SESSION['c_name']     = hesk_POST('name');
     $_SESSION['c_email']    = hesk_POST('email');
+    $_SESSION['c_phone']    = hesk_POST('phone');
+    $_SESSION['c_comment']  = hesk_POST('comment');
     $_SESSION['c_priority'] = hesk_POST('priority');
     $_SESSION['c_subject']  = hesk_POST('subject');
     $_SESSION['c_message']  = hesk_POST('message');
@@ -586,7 +593,7 @@ if ($hesk_settings['attachments']['use'] && ! empty($attachments) )
 
 // Get or create a customer for the name/email combo
 if (!isset($tmpvar['customer_id'])) {
-    $tmpvar['customer_id'] = hesk_get_or_create_customer($tmpvar['name'], $tmpvar['email']);
+    $tmpvar['customer_id'] = hesk_get_or_create_customer($tmpvar['name'], $tmpvar['email'],$tmpvar['phone'],$tmpvar['comment']);
 }
 $tmpvar['follower_ids'] = [];
 $removed_followers = [];

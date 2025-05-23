@@ -87,6 +87,8 @@ function hesk_get_or_create_customer($name, $email, $create_if_not_found = true)
 
     $name = $name === null ? '' : trim($name);
     $email = $email === null ? '' : $email;
+    $phone = $phone === null ? '' : $phone;
+    $comment = $comment === null ? '' : $comment;
 
     // If email is empty just create a new account
     if (empty($email)) {
@@ -123,8 +125,8 @@ function hesk_get_or_create_customer($name, $email, $create_if_not_found = true)
 
     //-- No match.  Create a new customer if the user wants to
     if ($create_if_not_found) {
-        hesk_dbQuery("INSERT INTO `".hesk_dbEscape($hesk_settings['db_pfix'])."customers` (`name`, `email`)
-        VALUES ('".hesk_dbEscape(trim($name))."', '".hesk_dbEscape(trim($email))."')");
+        hesk_dbQuery("INSERT INTO `".hesk_dbEscape($hesk_settings['db_pfix'])."customers` (`name`, `email`,`phone`,`comment`)
+        VALUES ('".hesk_dbEscape(trim($name))."', '".hesk_dbEscape(trim($email))."', '".hesk_dbEscape(trim($phone))."', '".hesk_dbEscape(trim($comment))."')");
 
         return hesk_dbInsertID();
     }
@@ -146,7 +148,7 @@ function hesk_get_or_create_follower($email) {
     }
 
     //-- No match.  Create a new customer
-    hesk_dbQuery("INSERT INTO `".hesk_dbEscape($hesk_settings['db_pfix'])."customers` (`name`, `email`)
+    hesk_dbQuery("INSERT INTO `".hesk_dbEscape($hesk_settings['db_pfix'])."customers` (`name`, `email`,`phone`,`comment`)
         VALUES ('', '".hesk_dbEscape(trim($email))."')");
 
     return hesk_dbInsertID();
@@ -319,7 +321,7 @@ function hesk_isCustomerLoggedIn($redirect = true) {
         // hesk_session_regenerate_id();
 
         // Let's make sure user still exists
-        $res = hesk_dbQuery( "SELECT `id`, `email`, `pass`, `name`, `email`, `language`, `mfa_enrollment` FROM `".$hesk_settings['db_pfix']."customers` WHERE `id` = '".intval($_SESSION['customer']['id'])."' LIMIT 1" );
+        $res = hesk_dbQuery( "SELECT `id`, `email`,`phone`,`comment`, `pass`, `name`, `email`, `language`, `mfa_enrollment` FROM `".$hesk_settings['db_pfix']."customers` WHERE `id` = '".intval($_SESSION['customer']['id'])."' LIMIT 1" );
 
         // Exit if user not found
         if (hesk_dbNumRows($res) === 1) {

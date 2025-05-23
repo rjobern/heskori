@@ -476,6 +476,8 @@ CREATE TABLE `".hesk_dbEscape($hesk_settings['db_pfix'])."customers` (
   `pass` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `comment` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `language` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `verified` smallint(1) UNSIGNED NOT NULL DEFAULT 0,
   `verification_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,

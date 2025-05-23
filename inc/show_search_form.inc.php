@@ -32,7 +32,7 @@ if ( ! isset($priority) )
 
 if ( ! isset($what) )
 {
-	$what = 'trackid';
+	$what = 'seqid';
 }
 
 if ( ! isset($owner_input) )
@@ -441,15 +441,16 @@ $("#toggleAllShow").click(function(event) {
             </div>
             <div class="search-options">
                 <select name="what">
-                    <option value="trackid" <?php if ($what=='trackid') {echo 'selected="selected"';} ?> ><?php echo $hesklang['trackID']; ?></option>
+                    
                     <?php
-                    if ($hesk_settings['sequential'])
+                        if ($hesk_settings['sequential'])
                     {
                         ?>
                         <option value="seqid" <?php if ($what=='seqid') {echo 'selected="selected"';} ?> ><?php echo $hesklang['seqid']; ?></option>
                         <?php
                     }
                     ?>
+                    <option value="trackid" <?php if ($what=='trackid') {echo 'selected="selected"';} ?> ><?php echo $hesklang['trackID']; ?></option>
                     <option value="name"    <?php if ($what=='name') {echo 'selected="selected"';} ?> ><?php echo $hesklang['name']; ?></option>
                     <option value="email"	<?php if ($what=='email') {echo 'selected="selected"';} ?> ><?php echo $hesklang['email']; ?></option>
                     <option value="subject" <?php if ($what=='subject') {echo 'selected="selected"';} ?> ><?php echo $hesklang['subject']; ?></option>

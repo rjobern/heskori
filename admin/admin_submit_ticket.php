@@ -534,7 +534,7 @@ if ($ticket['owner'] && $ticket['owner'] != intval($_SESSION['id']))
 // Ticket unassigned, notify everyone that selected to be notified about unassigned tickets
 elseif ( ! $ticket['owner'])
 {
-	hesk_notifyStaff('new_ticket_staff', " `id` != ".intval($_SESSION['id'])." AND `notify_new_unassigned` = '1' ");
+	//hesk_notifyStaff('new_ticket_staff', " `id` != ".intval($_SESSION['id'])." AND `notify_new_unassigned` = '1' ");
 }
 
 // Unset temporary variables

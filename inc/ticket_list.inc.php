@@ -266,7 +266,7 @@ if (true)
 		$query .= '&amp;s_ot='.$s_ot[2];
 		$query .= '&amp;s_un='.$s_un[2];
 		$query .= '&amp;page=1';
-		#$query .= '&amp;sort=';
+		$query .= '&amp;sort=';
 	}
 
     if ($is_quick_link !== false)
@@ -292,10 +292,8 @@ if (true)
 	?>
     <section class="quick-links">
         <div class="filters__listing">
-            <!--
             <a href="<?php echo $href . '?' . $query_for_quick_links . '&amp;ql=all&amp;s_my=1&amp;s_ot=1&amp;s_un=1&amp;category=0'; ?>" class="btn btn-transparent <?php if ($is_quick_link == 'all') echo 'is-bold is-selected'; ?>"><span><?php echo $hesklang['ql_all']; ?></span> <span class="filters__btn-value"><?php echo $totals['all']; ?></span></a>
             <a href="<?php echo $href . '?' . $query_for_quick_links . '&amp;ql=alo&amp;s_my=1&amp;s_ot=1&amp;s_un=1&amp;category=0'; ?>" class="btn btn-transparent <?php if ($is_quick_link == 'alo') echo 'is-bold is-selected'; ?>"><span><?php echo $hesklang['ql_alo']; ?></span> <span class="filters__btn-value"><?php echo $totals['open']; ?></span></a>
-             -->
             <a href="<?php echo $href . '?' . $query_for_quick_links . '&amp;ql=&amp;s_my=1&amp;s_ot=1&amp;s_un=1'; ?>" class="btn btn-transparent <?php if (empty($is_quick_link)) echo 'is-bold is-selected'; ?>"><span><?php
             if ($href == 'find_tickets.php') {
                 echo $hesklang['tickets_found'];
@@ -591,13 +589,13 @@ if (true)
 
 		// End ticket row
 		echo '
-		<td>
+		<!--td>
 		    <div class="dropdown priority" data-value="' . $ticket['priority'] . '" style="cursor: default">
                 <div class="label" style="cursor: default">
                     <span>' . $hesklang[$ticket['priority']] . '</span>
                 </div>
             </div>
-		</td>
+		</td-->
 		</tr>
 		';
 
@@ -735,10 +733,10 @@ if (true)
             <div class="clear-on-mobile"></div>
             <div class="inline-bottom">
                 <select name="a">
-                    <option value="low" selected="selected"><?php echo $hesklang['set_pri_to'].' '.$hesklang['low']; ?></option>
+                    <!--option value="low" selected="selected"><?php echo $hesklang['set_pri_to'].' '.$hesklang['low']; ?></option>
                     <option value="medium"><?php echo $hesklang['set_pri_to'].' '.$hesklang['medium']; ?></option>
                     <option value="high"><?php echo $hesklang['set_pri_to'].' '.$hesklang['high']; ?></option>
-                    <option value="critical"><?php echo $hesklang['set_pri_to'].' '.$hesklang['critical']; ?></option>
+                    <option value="critical"><?php echo $hesklang['set_pri_to'].' '.$hesklang['critical']; ?></option-->
                     <?php
                     if ( hesk_checkPermission('can_resolve', 0) && ! defined('HESK_DEMO') )
                     {
@@ -878,6 +876,7 @@ function hesk_print_list_head()
         </th>
         <?php
         $sort = hesk_GET('sort', 'status');
+        //$sort = hesk_GET('sort', 'id');
         $sort_direction = '';
         if (isset($_GET['asc'])) {
             $sort_direction = intval($_GET['asc']) == 0 ? 'desc' : 'asc';
@@ -901,14 +900,14 @@ function hesk_print_list_head()
             </th>';
         }
         ?>
-        <th class="sindu-handle <?php echo $sort == 'priority' ? $sort_direction : ''; ?>">
+        <!--th class="sindu-handle <?php echo $sort == 'priority' ? $sort_direction : ''; ?>">
             <a href="<?php echo $href . '?' . $query . $sort_possible['priority'] . '&amp;sort='; ?>priority">
                 <div class="sort">
                     <span><?php echo $hesklang['priority']; ?></span>
                     <i class="handle"></i>
                 </div>
             </a>
-        </th>
+        </th-->
     </tr>
     </thead>
     <tbody>

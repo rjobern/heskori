@@ -18,7 +18,10 @@ require(HESK_PATH . 'hesk_settings.inc.php');
 define('TEMPLATE_PATH', HESK_PATH . "theme/{$hesk_settings['site_theme']}/");
 require(HESK_PATH . 'inc/common.inc.php');
 require(HESK_PATH . 'inc/customer_accounts.inc.php');
-
+if ($hesk_settings['customer_portal']==0){
+header("Location:" . HESK_PATH . "admin/index.php");
+exit;
+}
 // Are we in maintenance mode?
 hesk_check_maintenance();
 
@@ -110,12 +113,16 @@ function print_add_ticket()
 		$_SESSION['c_email']  = $_REQUEST['email'];
 		$_SESSION['c_email2'] = $_REQUEST['email'];
 	}
-
     // Followers / CC
     if (isset($_REQUEST['cc'])) {
         $_SESSION['c_followers'] = $_REQUEST['cc'];
     }
-
+    if (isset($_REQUEST['phone'])) {
+		$_SESSION['c_phone'] = $_REQUEST['phone'];
+	}
+    if (isset($_REQUEST['comment'])) {
+		$_SESSION['c_comment'] = $_REQUEST['comment'];
+	}
 	// Priority
 	if ( isset($_REQUEST['priority']) )
 	{

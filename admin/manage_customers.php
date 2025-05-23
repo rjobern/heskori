@@ -443,7 +443,24 @@ if ( $action = hesk_REQUEST('a') )
                                 </div>
                             </a>
                         </th>
-                        <th><?php echo $hesklang['mfa_short']; ?></th>
+                       <!-- inserted roj lines 447 to 454 -->
+                       <th class="sindu-handle <?php echo $search_sort_column === 'phone' ? hesk_mb_strtolower($search_sort_direction) : '' ?>">
+                            <a href="<?php echo build_sort_url($sort_query_url, $url_sort_column, 'phone', $search_sort_direction); ?>">
+                                <div class="sort">
+                                    <span><?php echo $hesklang['phone']; ?></span>
+                                    <i class="handle"></i>
+                                </div>
+                            </a>
+                        </th>
+                        <!th class="sindu-handle <?php echo $search_sort_column === 'comment' ? hesk_mb_strtolower($search_sort_direction) : '' ?>">
+                            <!a href="<?php echo build_sort_url($sort_query_url, $url_sort_column, 'comment', $search_sort_direction); ?>">
+                                <!div class="sort">
+                                    <!span><!?php echo $hesklang['comment']; ?></span>
+                                    <!i class="handle"></i>
+                                <!/div>
+                                <!/a>
+                        <!/th>
+                        <!th><!?php echo $hesklang['mfa_short']; ?><!/th>
                         <?php if ($can_man_customers): ?>
                             <th></th>
                         <?php endif; ?>
@@ -533,50 +550,50 @@ $checkbox_code
 <td>$myuser[id]</td>
 <td>$myuser[name]</td>
 <td><a href="mailto:$myuser[email]">$myuser[email]</a></td>
-
+<td>$myuser[phone]</td>
+<!td>$myuser[comment]</td>
 EOC;
 
-                        $mfa_enrollment = intval($myuser['mfa_enrollment']);
-                        $mfa_status = $hesklang['mfa_method_none'];
-                        $mfa_reset = '';
-                        $modal_id = hesk_generate_old_delete_modal($hesklang['mfa_reset_to_default'],
-                            $hesklang['mfa_reset_confirm'],
-                            'manage_customers.php?a=resetmfa&amp;id='.$myuser['id'].'&amp;token='.hesk_token_echo(0),
-                            $hesklang['mfa_reset_yes']);
-
-                        if ($mfa_enrollment === 1) {
-                            $mfa_status = $hesklang['mfa_method_email'];
-
-                            if (!$hesk_settings['require_mfa'] && $can_man_customers) {
-
-                                $mfa_reset = '<div class="tooltype right out-close">
-                                <a href="javascript:" data-modal="[data-modal-id=\''.$modal_id.'\']"
-                                    title="'.$hesklang['mfa_reset_to_default'].'"
-                                    class="delete tooltip">
-                                    <svg class="icon icon-refresh">
-                                        <use xlink:href="'. HESK_PATH . 'img/sprite.svg#icon-refresh"></use>
-                                    </svg>
-                                </a>
-                            </div>';
-                            }
-                        } elseif ($mfa_enrollment === 2) {
-                            $mfa_status = $hesklang['mfa_method_auth_app_short'];
-
-                            if ($can_man_customers) {
-                                $mfa_reset = '<div class="tooltype right out-close">
-                                    <a href="javascript:" data-modal="[data-modal-id=\''.$modal_id.'\']"
-                                        title="'.$hesklang['mfa_reset_to_default'].'"
-                                        class="delete tooltip">
-                                        <svg class="icon icon-refresh">
-                                            <use xlink:href="'. HESK_PATH . 'img/sprite.svg#icon-refresh"></use>
-                                        </svg>
-                                    </a>
-                                </div>';
-                            }
-                        }
+//                        $mfa_enrollment = intval($myuser['mfa_enrollment']);
+//                        $mfa_status = $hesklang['mfa_method_none'];
+//                        $mfa_reset = '';
+//                        $modal_id = hesk_generate_old_delete_modal($hesklang['mfa_reset_to_default'],
+//                            $hesklang['mfa_reset_confirm'],
+//                            'manage_customers.php?a=resetmfa&amp;id='.$myuser['id'].'&amp;token='.hesk_token_echo(0),
+//                            $hesklang['mfa_reset_yes']);
+//
+//                        if ($mfa_enrollment === 1) {
+//                            $mfa_status = $hesklang['mfa_method_email'];
+//
+//                            if (!$hesk_settings['require_mfa'] && $can_man_customers) {
+//                                $mfa_reset = '<div class="tooltype right out-close">
+//                                <a href="javascript:" data-modal="[data-modal-id=\''.$modal_id.'\']"
+//                                    title="'.$hesklang['mfa_reset_to_default'].'"
+//                                    class="delete tooltip">
+//                                    <svg class="icon icon-refresh">
+//                                       <use xlink:href="'. HESK_PATH . 'img/sprite.svg#icon-refresh"></use>
+//                                   </svg>
+//                               </a>
+//                            </div>';
+//                            }
+//                        } elseif ($mfa_enrollment === 2) {
+//                            $mfa_status = $hesklang['mfa_method_auth_app_short'];
+//
+//                            if ($can_man_customers) {
+//                                $mfa_reset = '<div class="tooltype right out-close">
+//                                    <a href="javascript:" data-modal="[data-modal-id=\''.$modal_id.'\']"
+//                                        title="'.$hesklang['mfa_reset_to_default'].'"
+//                                        class="delete tooltip">
+//                                        <svg class="icon icon-refresh">
+//                                            <use xlink:href="'. HESK_PATH . 'img/sprite.svg#icon-refresh"></use>
+//                                        </svg>
+//                                    </a>
+//                                </div>';
+//                            }
+//                        }
                         $actions_html = $can_man_customers ? '<td class="nowrap buttons"><p>'.$approval_code.' '.$resend_email_code.' '.$edit_code.' '.$remove_code.'</p></td>' : '';
                         echo <<<EOC
-<td>$mfa_status $mfa_reset</td>
+<!td>$mfa_status $mfa_reset<!/td>
 $actions_html
 </tr>
 
@@ -809,6 +826,8 @@ function new_user()
 	`pass`,
 	`name`,
 	`email`,
+    'phone',
+    'comment',
 	`language`,
 	`verified`,
 	`verification_token`,
@@ -817,7 +836,9 @@ function new_user()
 	) VALUES (
 	".$pass.",
 	'".hesk_dbEscape($myuser['name'])."',
-	'".hesk_dbEscape($myuser['email'])."',
+	'".hesk_dbEscape($myuser['email'])."', 
+    '".hesk_dbEscape($myuser['phone'])."',
+    '".hesk_dbEscape($myuser['comment'])."',
 	NULL,
 	".intval($myuser['verified']).",
 	NULL,
@@ -880,6 +901,8 @@ function update_user()
     "UPDATE `".hesk_dbEscape($hesk_settings['db_pfix'])."customers` SET
     `name`='".hesk_dbEscape($myuser['name'])."',
     `email`='".hesk_dbEscape($myuser['email'])."',
+    `phone`='".hesk_dbEscape($myuser['phone'])."', 
+    `comment`='".hesk_dbEscape($myuser['comment'])."', 
     {$password_part}
     `verified`=".$myuser['verified']."
     WHERE `id`='".intval($myuser['id'])."'");
@@ -926,6 +949,8 @@ function hesk_validateUserInfo($redirect_to = './manage_customers.php')
             $errors[] = 'email';
         }
     }
+    $myuser['phone']=hesk_POST('phone');
+    $myuser['comment']=hesk_POST('comment');
 
     /* Password */
 	$myuser['cleanpass'] = '';

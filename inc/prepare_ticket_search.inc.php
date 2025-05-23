@@ -60,7 +60,8 @@ if ( ! isset($group_possible[$group]))
 }
 
 // Sort parameter
-$sort = hesk_GET('sort', 'status');
+$sort = hesk_GET('sort', 'id');
+//$sort = hesk_GET('sort', 'status');
 if ( ! isset($sort_possible[$sort]))
 {
     $sort = 'status';
@@ -152,12 +153,12 @@ if (isset($_GET['asc']) && intval($_GET['asc'])==0)
 }
 else
 {
-    $sql .= ' ASC ';
+    $sql .= ' DESC ';
     $asc = 1;
     $asc_rev = 0;
     if (!isset($_GET['asc']))
     {
-    	$is_default = 1;
+    	$is_default = 0;
     }
 
     $sort_possible[$sort] = 0;
@@ -166,7 +167,7 @@ else
 /* In the end same results should always be sorted by priority */
 if ($sort != 'priority')
 {
-	$sql .= ' , `priority` ASC ';
+	//$sql .= ' , `priority` ASC ';
 }
 
 # Uncomment for debugging purposes

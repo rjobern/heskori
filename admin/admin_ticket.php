@@ -1028,7 +1028,7 @@ $options = array(
                         </div>
                     </div>
                 <?php endif; ?>
-                <?php echo $ticket['subject']; ?>
+                <!--?php echo $ticket['subject']; ?-->
             </h3>
             <?php endif; ?>
             <div class="block--head">
@@ -1277,12 +1277,13 @@ $options = array(
                             $ticket[$k] = '<a href="mailto:'.$ticket[$k].'">'.$ticket[$k].'</a>';
                             break;
                     }
-
+                     if (!$v['type]']='select') {
                     echo '
 					<div>
-                        <span class="custom-field-title">'.$v['name:'].'</span>
+                        <span class="block--description browser-default">'.$v['name:'].'</span>
                         <span>'.$ticket[$k].'</span>
 					</div>';
+                     }
                 }
             }
 
@@ -1290,29 +1291,32 @@ $options = array(
             {
                 ?>
                 <div class="block--description browser-default">
-                    <p><?php echo $ticket['message_html']; ?></p>
+                    <p><?php echo $hesklang['message']; ?>: <?php echo $ticket['message_html']; ?></p>
                     <p></p>
                 </div>
                 <?php
             }
-
-            /* custom fields after message */
+//             Ausgeschaltet
+//            /* custom fields after message */
             foreach ($hesk_settings['custom_fields'] as $k=>$v)
             {
                 if ($v['use'] && $v['place'] && (strlen($ticket[$k]) || hesk_is_custom_field_in_category($k, $ticket['category'])) )
                 {
                     switch ($v['type'])
                     {
+                            
                         case 'email':
                             $ticket[$k] = '<a href="mailto:'.$ticket[$k].'">'.$ticket[$k].'</a>';
                             break;
                     }
-
+                    if ($v['type]']<>'select' &&  !empty($ticket[$k]))
+                {
                     echo '
 					<div>
-                        <span class="custom-field-title">'.$v['name:'].'</span>
+                        <span class="block--description browser-default">'.$v['name:'].'</span>
                         <span>'.$ticket[$k].'</span>
 					</div>';
+                }
                 }
             }
 
@@ -1578,6 +1582,7 @@ $options = array(
             ?>
 
             <!-- Ticket category -->
+            <!--
             <div class="row">
                 <div class="title">
                     <label for="select_category">
@@ -1602,9 +1607,9 @@ $options = array(
                 endif;
                 ?>
             </div>
-
+            -->
             <!-- Ticket priority -->
-            <div class="row">
+            <!-- div class="row">
                 <div class="title">
                     <label for="select_priority">
                         <?php echo $hesklang['priority']; ?>:
@@ -1636,6 +1641,7 @@ $options = array(
                 endif;
                 ?>
             </div>
+            -->
 
             <!-- Ticket assigned to -->
             <div class="row">
@@ -1645,9 +1651,9 @@ $options = array(
                     </label>
                 </div>
                 <?php if (hesk_checkPermission('can_assign_others',0)): ?>
-                <form action="assign_owner.php" method="post">
+                <form id="form_owner" action="assign_owner.php" method="post">
                     <div class="value dropdown-select center out-close">
-                        <select id="select_owner" name="owner" onchange="this.form.submit()" data-append-icon-class="icon-person">
+                        <select id="select_owner" name="owner" onchange="submitOwnerForm()" data-append-icon-class="icon-person">
                             <option value="-1"> &gt; <?php echo $hesklang['unas']; ?> &lt; </option>
                             <?php
                             foreach ($admins as $k=>$v)
@@ -1658,6 +1664,7 @@ $options = array(
                         </select>
                         <input type="hidden" name="track" value="<?php echo $trackingID; ?>">
                         <input type="hidden" name="token" value="<?php hesk_token_echo(); ?>">
+                        <input type="hidden" name="s" id="hidden_s_in_owner_form" value="">
                         <?php
                         if (!$ticket['owner'])
                         {
@@ -1676,6 +1683,23 @@ $options = array(
                 endif;
                 ?>
             </div>
+<script>
+function submitOwnerForm() {
+  // Wert von 's' aus dem anderen Formular holen
+ 
+  var sElement = document.getElementById('select_s');
+  if (!sElement) {
+    alert("Fehler: 'select_s' nicht gefunden!");
+    return;
+  }
+    var sVal = sElement.value;
+  // In das versteckte Feld im Owner-Formular schreiben
+  document.getElementById('hidden_s_in_owner_form').value = sVal;
+  // Owner-Formular abschicken
+  console.log("Wert von s:", sVal);
+ document.getElementById('form_owner').submit();
+}
+</script>
 
             <!-- Ticket one click assign to self -->
             <?php if (!$ticket['owner'] && $can_assign_self): ?>
@@ -1688,6 +1712,73 @@ $options = array(
             <?php
             endif;
             ?>
+
+           <!-- Customfields can be changed in den adminticket --> 
+            
+<?php
+
+foreach ($hesk_settings['custom_fields'] as $k=>$v)
+{
+    // Platzierung der Customfields sind  unwichtig 
+    if ($v['use'] !=0 && hesk_is_custom_field_in_category($k, $category) )
+    {
+        $v['req'] = $v['req']==2 ? '<span class="important">*</span>' : '';
+        $k_value  = $ticket[$k];
+        switch ($v['type'])
+        {
+            //nur Selectetd Bos
+            /* Select drop-down box */
+            case 'select':
+                 echo '
+                    <div class="row">
+                        <div class="title">
+                        <label for="edit_">'.$v['name:'].' '.$v['req'].'</label>
+                    </div>
+                    <form action="custom.php" method="post">
+                        <div class="value dropdown-select center out-close">    
+                            <select name="customvalue" id="'.$k. '"onchange="this.form.submit()" >';
+                      // Show "Click to select"?
+                      if ( ! empty($v['value']['show_select']))
+                      {
+                          echo '<option value="">'.$hesklang['select'].'</option>';
+                      }
+
+                      foreach ($v['value']['select_options'] as $option)
+                      {
+                          if ($k_value == $option)
+                          {
+                              $k_value = $option;
+                              $selected = 'selected';
+                          }
+                          else
+                          {
+                              $selected = '';
+                          }
+                          echo '<option value="' .$option. '" ' . $selected . '>' .$option. '</option>';
+                          //echo '<option '.$selected.'value=>'.$option.'</option>';
+                      }
+                        echo '</select>
+    
+                        </div>';
+                        echo '<input type="hidden" name="track" value='.$trackingID; echo '>' ;   
+                        echo '<input type="hidden" name="customId" value='.$k; echo '>';
+                        echo '<input type="hidden" name="customName" value='.$v['name']; echo '>';
+                        ob_start();
+                        hesk_token_echo();
+                        $token = ob_get_clean();
+                        echo '<input type="hidden" name="token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+                    echo '
+                    </div>
+                   
+                    ';
+                    echo '</form>';
+               break;  
+            
+        }
+    }
+}
+?>
+<!-- END CUSTOM BEFORE -->
         </section>
         <section class="params--block details accordion visible">
             <h4 class="accordion-title">
@@ -1697,7 +1788,7 @@ $options = array(
                 </svg>
             </h4>
             <div class="accordion-body" style="display:block">
-                <div class="row">
+                <!-- div class="row">
                     <div class="title"><?php echo $hesklang['trackID']; ?>:</div>
                     <div class="value"><?php echo $trackingID; ?>
                     <a href="javascript:" title="<?php echo $hesklang['copy_value']; ?>" onclick="navigator.clipboard.writeText('<?php echo $trackingID; ?>');$('#copy-tid').addClass('copied');setTimeout(function(){$('#copy-tid').removeClass('copied')}, 150);">
@@ -1727,7 +1818,7 @@ $options = array(
                             <div class="notification--text"><?php echo $hesklang['copy_link_exp']; ?></div>
                         </div>
                     </div>
-                </div>
+                </div -->
                 <?php
                 if ($hesk_settings['sequential'])
                 {
@@ -1977,6 +2068,7 @@ $options = array(
         <p><?php echo $hesklang['sending_wait']; ?></p>
     </div>
 </div>
+
 <?php
 /* Clear unneeded session variables */
 hesk_cleanSessionVars('ticket_message');

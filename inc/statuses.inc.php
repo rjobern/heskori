@@ -45,16 +45,16 @@ function hesk_load_statuses($use_cache=1)
         'class' => 'open',
     );
     // 1 = CUSTOMER REPLIED
-    $hesk_settings['statuses'][1] = array(
-        'name'  => $hesklang['wait_reply'],
-        'class' => 'waitingreply',
-    );
+    //$hesk_settings['statuses'][1] = array(
+    //    'name'  => $hesklang['wait_reply'],
+    //    'class' => 'waitingreply',
+    //);
     // 2 = STAFF REPLIED
-    $hesk_settings['statuses'][2] = array(
-        'name'  => $hesklang['replied'],
-        'class' => 'replied',
-    );
-    // 3 = RESOLVED
+    //$hesk_settings['statuses'][2] = array(
+    //    'name'  => $hesklang['replied'],
+    //    'class' => 'replied',
+    //);
+    // 3 = RESOLVED /geschlossen Ware abgeholt/entsorgt
     $hesk_settings['statuses'][3] = array(
         'name'  => $hesklang['closed'],
         'class' => 'resolved',
