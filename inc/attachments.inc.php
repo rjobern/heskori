@@ -20,8 +20,8 @@ Function hesk_uploadFiles()
 function hesk_uploadFile($i)
 {
 	global $hesk_settings, $hesklang, $trackingID, $hesk_error_buffer;
-
 	/* Return if name is empty */
+
 	if (empty($_FILES['attachment']['name'][$i])) {return '';}
 
     /* Parse the name */
@@ -37,7 +37,7 @@ function hesk_uploadFile($i)
 	/* Check file size */
 	if ($_FILES['attachment']['size'][$i] > $hesk_settings['attachments']['max_size'])
 	{
-	    return hesk_fileError(sprintf($hesklang['file_too_large'], $file_realname));
+        return hesk_fileError(sprintf($hesklang['file_too_large'], $file_realname));
 	}
 	else
 	{
@@ -85,10 +85,75 @@ function hesk_generateAttachmentName($file_realname, $ext, $tracking_id = '') {
 
     return substr($tracking_id . '_' . md5($tmp . $file_realname), 0, 200) . $ext;
 }
+function createResizedImage ($filepath_old, $filepath_new, $image_dimension, $scale_mode = 0) {
+  if (!(file_exists($filepath_old))) return false;
 
+  $image_attributes = getimagesize($filepath_old);
+  $image_width_old = $image_attributes[0];
+  $image_height_old = $image_attributes[1];
+  $image_filetype = $image_attributes[2];
+
+  if ($image_width_old <= 0 || $image_height_old <= 0) return false;
+  $image_aspectratio = $image_width_old / $image_height_old;
+
+  if ($scale_mode == 0) {
+   $scale_mode = ($image_aspectratio > 1 ? -1 : -2);
+  } elseif ($scale_mode == 1) {
+   $scale_mode = ($image_aspectratio > 1 ? -2 : -1);
+  }
+
+  if ($scale_mode == -1) {
+   $image_width_new = $image_dimension;
+   $image_height_new = round($image_dimension / $image_aspectratio);
+  } elseif ($scale_mode == -2) {
+   $image_height_new = $image_dimension;
+   $image_width_new = round($image_dimension * $image_aspectratio);
+  } else {
+   return false;
+  }
+
+  switch ($image_filetype) {
+   case 1:
+    $image_old = imagecreatefromgif($filepath_old);
+    $image_new = imagecreate($image_width_new, $image_height_new);
+    imagecopyresampled($image_new, $image_old, 0, 0, 0, 0, $image_width_new, $image_height_new, $image_width_old, $image_height_old);
+    imagegif($image_new, $filepath_new);
+    break;
+
+   case 2:
+    $image_old = ImageCreateFromJpeg($filepath_old);
+    $image_new = imagecreatetruecolor($image_width_new, $image_height_new);
+    imagecopyresampled($image_new, $image_old, 0, 0, 0, 0, $image_width_new, $image_height_new, $image_width_old, $image_height_old);
+    imagejpeg($image_new, $filepath_new);
+    break;
+
+   case 3:
+    $image_old = imagecreatefrompng($filepath_old);
+    $image_colordepth = imagecolorstotal($image_old);
+
+    if ($image_colordepth == 0 || $image_colordepth > 255) {
+     $image_new = imagecreatetruecolor($image_width_new, $image_height_new);
+    } else {
+     $image_new = imagecreate($image_width_new, $image_height_new);
+    }
+
+    imagealphablending($image_new, false);
+    imagecopyresampled($image_new, $image_old, 0, 0, 0, 0, $image_width_new, $image_height_new, $image_width_old, $image_height_old);
+    imagesavealpha($image_new, true);
+    imagepng($image_new, $filepath_new);
+    break;
+
+   default:
+    return false;
+  }
+
+  imagedestroy($image_old);
+  imagedestroy($image_new);
+  return true;
+ }
 function hesk_uploadTempFile() {
     global $hesk_settings, $hesklang;
-
+    
     /* Return if name is empty */
     if (empty($_FILES['attachment']['name'])) {
         return null;
@@ -107,14 +172,33 @@ function hesk_uploadTempFile() {
         );
     }
 
-    /* Check file size */
+    /* Check file size and resize */
     if ($_FILES['attachment']['size'] > $hesk_settings['attachments']['max_size']) {
+        $fnumber=exif_imagetype($_FILES['attachment']['tmp_name']);
+       if ($fnumber)
+       {
+        if ($fnumber <= 3) {
+            $max_width = 1000;
+            $max_height = 600;
+            
+            $out=createResizedImage ($_FILES['attachment']['tmp_name'], $_FILES['attachment']['tmp_name'], $max_width,  0);
+            if (!$out) {goto a;}
+            $_FILES['attachment']['size']=filesize($_FILES['attachment']['tmp_name']);
+         }
+         else {
+            a:
         return array(
-            'status' => 'failure',
-            'status_code' => 400,
-            'message' => sprintf($hesklang['file_too_large'], $file_realname)
-        );
+        'status' => 'failure',
+        'status_code' => 400,
+        'message' => sprintf($hesklang['file_too_large'], $file_realname));
+         }
+       } 
+       else {
+        //File is not img
+        goto b;
+       }
     } else {
+        b:
         $file_size = $_FILES['attachment']['size'];
     }
 
@@ -353,7 +437,7 @@ function display_dropzone_field($url, $is_admin, $id = 'filedrop', $max_files_ov
         parallelUploads: {$max_files},
         maxFiles: {$max_files},
         acceptedFiles: ".json_encode($acceptedFiles).",
-        maxFilesize: {$size}, // MB
+        //maxFilesize: {$size}, // MB
         dictDefaultMessage: ".json_encode($hesklang['attachment_viewer_message']).",
         dictFallbackMessage: '',
         dictInvalidFileType: ".json_encode($hesklang['attachment_invalid_type_message']).",
@@ -370,7 +454,7 @@ function display_dropzone_field($url, $is_admin, $id = 'filedrop', $max_files_ov
     
     dropzone{$id}.on('success', function(file, response) {
         var jsonResponse = JSON.parse(response);
-        // console.log(JSON.stringify(jsonResponse, null, 4));
+         //console.log(JSON.stringify(jsonResponse, null, 4));
 
         if(jsonResponse.hasOwnProperty('status') && jsonResponse['status'] == 'failure'){
             // Upload was OK, but something failed on the server-side
